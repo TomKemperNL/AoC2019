@@ -1,4 +1,4 @@
-module AoC2019.Week1
+module AoC2019.Day1
 open System
 
 let log message x =

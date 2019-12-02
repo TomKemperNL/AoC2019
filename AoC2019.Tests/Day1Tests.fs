@@ -1,4 +1,4 @@
-module AoC2019.Week1.Tests
+module AoC2019.Day1.Tests
 
 open NUnit.Framework
 open FsUnit
