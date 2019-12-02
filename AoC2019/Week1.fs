@@ -1,5 +1,4 @@
 module AoC2019.Week1
-
 open System
 
 let log message x =
@@ -14,9 +13,8 @@ let fuelrequired (m:int) =
         |> int
 
 let rec fuelrequired2 (m:int) = 
-    let fuelForMass = fuelrequired m |> max 0 
-    let requiredForFuel = fuelrequired fuelForMass |> max 0
-    if requiredForFuel = 0 then
-        fuelForMass
+    let fuelmass = fuelrequired m |> max 0     
+    if fuelmass = 0 then
+        fuelmass
     else
-        fuelForMass + requiredForFuel + fuelrequired2 requiredForFuel
+        fuelmass + fuelrequired2 fuelmass

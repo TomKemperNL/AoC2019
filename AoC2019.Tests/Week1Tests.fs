@@ -4,6 +4,10 @@ open NUnit.Framework
 open FsUnit
 open System.IO
 
+let input =     
+    File.ReadAllLines("./Week1InputA.txt") |>
+         Seq.map System.Int32.Parse
+
 [<Test>]
 let ``Mass Example`` () = 
     fuelrequired 12 |> should equal 2
@@ -13,12 +17,7 @@ let ``Mass Example`` () =
 
 [<Test>]
 let ``Part A`` () =
-    let lines = File.ReadAllLines("./Week1InputA.txt")
-    lines 
-        |> Seq.map (fun s -> s.Trim())
-        |> Seq.map (fun s -> System.Int32.Parse s)
-        |> Seq.map fuelrequired
-        |> Seq.sum
+    Seq.sumBy fuelrequired input
         |> should equal 3471229
 
 [<Test>]
@@ -28,11 +27,6 @@ let ``Mass Example B`` () =
     fuelrequired2 100756 |> should equal 50346
 
 [<Test>]
-let ``Part B`` () =
-    let lines = File.ReadAllLines("./Week1InputA.txt")
-    lines 
-        |> Seq.map (fun s -> s.Trim())
-        |> Seq.map (fun s -> System.Int32.Parse s)
-        |> Seq.map fuelrequired2
-        |> Seq.sum
+let ``Part B`` () =    
+    Seq.sumBy fuelrequired2 input
         |> should equal 5203967
