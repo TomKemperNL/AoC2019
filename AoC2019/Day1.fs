@@ -1,10 +1,6 @@
 module AoC2019.Day1
 open System
 
-let log message x =
-    printfn "%s %O" message x
-    x
-
 let fuelrequired (m:int) =
     m   |> float          
         |> fun x -> x / 3.0        
