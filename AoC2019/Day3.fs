@@ -52,11 +52,11 @@ let manhattan line1 line2 =
         |> Set.minElement
 
 let steps line1 line2 =
-    let l1 = toCoordinates (parse line1) ([],(0,0)) |> fst 
-    let l2 = toCoordinates (parse line2) ([],(0,0)) |> fst     
+    let l1 = toCoordinates (parse line1) ([],(0,0)) |> fst |> List.ofSeq
+    let l2 = toCoordinates (parse line2) ([],(0,0)) |> fst |> List.ofSeq
 
-    let findSpot p = Seq.findIndex ((=) p)
+    let findSpot p = List.findIndex ((=) p)
 
-    Set.intersect (Set.ofSeq l1) (Set.ofSeq l2) 
+    Set.intersect (Set.ofList l1) (Set.ofList l2) 
         |> Set.map (fun p -> findSpot p l1 + findSpot p l2 + 2)
         |> Set.minElement
