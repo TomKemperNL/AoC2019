@@ -50,4 +50,13 @@ let manhattan line1 line2 =
         |> Set.map (log "intersection")
         |> Set.map (fun (x,y) -> System.Math.Abs x + System.Math.Abs y)
         |> Set.minElement
-  
+
+let steps line1 line2 =
+    let l1 = toCoordinates (parse line1) ([],(0,0)) |> fst 
+    let l2 = toCoordinates (parse line2) ([],(0,0)) |> fst     
+
+    let findSpot p = Seq.findIndex ((=) p)
+
+    Set.intersect (Set.ofSeq l1) (Set.ofSeq l2) 
+        |> Set.map (fun p -> findSpot p l1 + findSpot p l2 + 2)
+        |> Set.minElement
