@@ -16,37 +16,31 @@ let isIncreasing x =
 let hasTwoAdjacent x = 
     let xAsList = toList x
     List.zip (List.skip 1 xAsList) (List.take 5 xAsList) 
-        |> List.exists (fun (x,y) -> (x = y))
-        
+        |> List.exists (fun (x,y) -> (x = y))        
 
-let hasThreeAdjacent x =
-    let xAsList = toList x    
-    let length = List.length xAsList
+let getExactPairs xAsList =     
+    seq {
+        let list = new System.Collections.Generic.List<int>()
+        let mutable previous = -1        
+        for i in xAsList do                        
+            if i <> previous then
+                if list.Count = 2 then                    
+                    yield List.ofSeq list
+                list.Clear()
+                list.Add i
+            else                
+                list.Add i                
+            previous <- i  
 
-    let left = List.take (length - 2) xAsList
-    let middle = (List.skip 1 >> List.take (length - 2)) xAsList 
-    let right = List.skip 2 xAsList
-
-    List.zip3 left middle right |> List.exists (fun (x,y,z) -> (x = y) && (y = z))
+        if list.Count = 2 then            
+            yield List.ofSeq list
+    } 
 
 let hasExactlyTwoAdjacent x =
-    let xAsList = toList x    
-    let pairs = seq {
-        let list = new System.Collections.Generic.List<int>()
-        let mutable current = -1
-        for i in xAsList do
-            if i <> current then
-                if list.Count >= 2 then
-                    yield list
-                list.Clear()
-            else 
-                if list.Count < 2 then
-                    list.Add(i)
-                else 
-                    list.Clear()
-            current <- i
-            list.Add i
-    }
+    let xAsList = toList (x |> log "input:")  
+    let pairs = getExactPairs xAsList
+    log "wut: " (Seq.length pairs) |> ignore    
+    Seq.iter (fun ps -> logMany "pairs" ps |> ignore) pairs
     not <| Seq.isEmpty pairs
     
 

@@ -1,8 +1,13 @@
 module AoC2019.Shared
 
-let log message x =
+let log message (x: 'a) =
     printfn "%s %O" message x
     x
+
+let logMany message (xs: 'a seq) =
+    let joined = String.concat "," (Seq.map (sprintf "%O") xs)
+    log message joined |> ignore    
+    xs
 
 open System.Text.RegularExpressions
 

@@ -28,19 +28,30 @@ let ``Day4 A`` () =
     ]
 
     seq { min .. max } |> Seq.filter (isCandidate rules) |> Seq.length |> should equal 2779
-
-[<Test>]
-let ``Has Three Adjacent`` () =
-    hasThreeAdjacent 112211 |> should equal false
-    hasThreeAdjacent 111223 |> should equal true
-    hasThreeAdjacent 112223 |> should equal true
-
+    
 [<Test>]
 let ``Has Exactly two Adjacent`` () =
     hasExactlyTwoAdjacent 112233 |> should equal true
     hasExactlyTwoAdjacent 123444 |> should equal false
-    hasExactlyTwoAdjacent 444123 |> should equal false
+    hasExactlyTwoAdjacent 444123 |> should equal false    
+    hasExactlyTwoAdjacent 111111 |> should equal false    
+    hasExactlyTwoAdjacent 121111 |> should equal false
+    hasExactlyTwoAdjacent 221111 |> should equal true
+    hasExactlyTwoAdjacent 122111 |> should equal true
+    hasExactlyTwoAdjacent 112211 |> should equal true
+    hasExactlyTwoAdjacent 111221 |> should equal true
     hasExactlyTwoAdjacent 111122 |> should equal true
+
+[<Test>]
+let ``Get Exact Pairs`` () =
+    getExactPairs (toList 112233) |> should equivalent [[1;1];[2;2;];[3;3;]]
+    getExactPairs (toList 123444) |> should equivalent []
+    getExactPairs (toList 111112) |> should equivalent []
+    getExactPairs (toList 211111) |> should equivalent []
+    getExactPairs (toList 111121) |> should equivalent []
+    getExactPairs (toList 111221) |> should equivalent [[2;2;]]
+    getExactPairs (toList 111122) |> should equivalent [[2;2;]]
+    
 
 [<Test>]
 let ``Can convert number to list`` () =
@@ -60,4 +71,6 @@ let ``Day4 B`` () =
 
     let result = seq { min .. max } |> Seq.filter (isCandidate rules) |> Seq.length     
     result |> should greaterThan 1444    
-    result  |> should greaterThan 1847
+    result |> should greaterThan 1847
+    result |> should not' (equal 2028)
+    result |> should equal 1972
