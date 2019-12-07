@@ -11,7 +11,7 @@ let input =
         |> List.map System.Int32.Parse
 
 let test input = 
-    run (Intcode input) 0 |> fun (Intcode x) -> x 
+    run (Program input) 0 |> fun (Program x) -> x 
 
 [<Test>]
 let ``Day2 Example`` () =     
@@ -23,11 +23,11 @@ let ``Day2 Example`` () =
 
 [<Test>]
 let ``Day2 A`` () =    
-    runValue (Intcode input) 12 2 |> should equal 4138658
+    runValue (Program input) 12 2 |> should equal 4138658
 
 [<Test>]
 let ``Day2 B, by brute force...`` () =    
-    match (bruteForce (Intcode input) 19690720) with
+    match (bruteForce (Program input) 19690720) with
     | Some (n,v) -> 
         let result = (100 * n) + v
         result |> should equal 7264
