@@ -38,3 +38,26 @@ let ``Day5 A`` () =
     
     Seq.sum tests |> should equal 0
     diag |> should equal 5074395
+    
+[<Test>]
+let ``Day5 B Examples`` () =
+    let program = [3;12;6;12;15;1;13;14;13;4;13;99;-1;0;1;9]
+    let mutable out = -1
+    let output x = 
+        out <- x
+    run (Program program) 0 (fun () -> 0) output |> ignore
+    out |> should equal 0
+
+
+[<Test>]
+let ``Day5 B`` () =
+    let input () = 5
+    let out = new System.Collections.Generic.List<int>()
+    let output x = 
+        out.Add(x)
+    run (Program program) 0 input output |> ignore
+    let diag = match Seq.rev out |> List.ofSeq with
+    | [diag] -> diag
+    | _ -> failwith "Nope"    
+    
+    diag |> should equal 8346937

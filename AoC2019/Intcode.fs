@@ -24,6 +24,10 @@ type Opcode =
     | Multiply
     | Input
     | Output
+    | JumpIfTrue
+    | JumpIfFalse
+    | LessThan
+    | Equals
 
 module Opcode = 
     let fromList xs =
@@ -33,12 +37,17 @@ module Opcode =
         | [0;2] -> Multiply
         | [0;3] -> Input
         | [0;4] -> Output
+        | [0;5] -> JumpIfTrue
+        | [0;6] -> JumpIfFalse
+        | [0;7] -> LessThan
+        | [0;8] -> Equals
         | xs -> failwith <| sprintf "Unknown opcode %O" xs
 
     let arity op =
         match op with
-        | Halt -> 0
-        | Add | Multiply -> 3        
+        | Halt -> 0        
+        | Add | Multiply | LessThan | Equals -> 3        
+        | JumpIfTrue | JumpIfFalse -> 2
         | Input | Output -> 1    
 
 let noInput = fun() -> failwith "No Input Configured"
@@ -96,6 +105,29 @@ let run (Program ints) (pos: int) (input: Input) (output: Output) =
             runArray inputArray next
         | (Output, [(p, pmode)], next) ->
             output (evaluateParam (p, pmode))
+            runArray inputArray next
+        | (JumpIfTrue, [(test, testMode); (p, pmode)], next) ->
+            if evaluateParam (test,testMode) <> 0 then
+                runArray inputArray (evaluateParam (p,pmode))
+            else
+                runArray inputArray next
+        | (JumpIfFalse, [(test, testMode); (p, pmode)], next) ->
+            if evaluateParam (test,testMode) = 0 then
+                runArray inputArray (evaluateParam (p,pmode))
+            else
+                runArray inputArray next
+        | (LessThan, [(x,xmode);(y,ymode);(p,pmode)], next) ->
+            if evaluateParam (x,xmode) < evaluateParam (y, ymode) then
+                set p 1                
+            else
+                set p 0
+                    
+            runArray inputArray next
+        | (Equals, [(x,xmode);(y,ymode);(p,pmode)], next) ->
+            if evaluateParam (x,xmode) = evaluateParam (y, ymode) then
+                set p 1                
+            else
+                set p 0                
             runArray inputArray next
         | (op, args, next) ->        
             sprintf "Unknown operator: %O on %s" op (System.String.Join(',', args))|> failwith
