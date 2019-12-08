@@ -6,7 +6,7 @@ open FsUnit
 open System.IO
 
 let input =     
-    File.ReadAllText("./Week2InputA.txt").Split(',') 
+    File.ReadAllText("./Dag2InputA.txt").Split(',') 
         |> List.ofArray
         |> List.map System.Int32.Parse
 

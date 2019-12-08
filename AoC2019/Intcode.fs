@@ -1,8 +1,22 @@
 ﻿module AoC2019.Intcode
 
+open AoC2019.Shared
+
 type Input = unit -> int
 type Output = int -> unit
 type Program = Program of int list
+type ParameterMode =
+    | Position
+    | Immediate
+
+module ParameterMode =
+    let fromInt x =
+    match x with
+    | 0 -> Position
+    | 1 -> Immediate
+    | n -> failwith <| sprintf "Unknown parameter mode %d" n
+
+type Parameter = ParameterMode * int
 
 type Opcode = 
     | Halt
@@ -10,52 +24,78 @@ type Opcode =
     | Multiply
     | Input
     | Output
-    
-let mapping = dict [
-    (99, Halt);
-    (1, Add);
-    (2, Multiply);
-    (3, Input);
-    (4, Output);
-]
 
-let arity = dict [
-    (Halt, 0);
-    (Add, 3);
-    (Multiply, 3);
-    (Input, 1);
-    (Output, 1)
-]
+module Opcode = 
+    let fromList xs =
+        match xs with 
+        | [9;9] -> Halt
+        | [0;1] -> Add
+        | [0;2] -> Multiply
+        | [0;3] -> Input
+        | [0;4] -> Output
+        | xs -> failwith <| sprintf "Unknown opcode %O" xs
+
+    let arity op =
+        match op with
+        | Halt -> 0
+        | Add | Multiply -> 3        
+        | Input | Output -> 1    
 
 let noInput = fun() -> failwith "No Input Configured"
 let noOutput = fun x -> failwith "No Output Configured"
 
+let parseInstruction x =     
+    let items = toList x 
+    let items = if items.Length > 1 then items else 0::items //Backwards compatibility with day2, where instructions might be 1 length
+    let paramModes, operator = List.splitAt ((List.length items) - 2) items    
+    let op = Opcode.fromList operator
+    let paramModes = paramModes |> Seq.rev 
+    let paramModes = Seq.append paramModes (Seq.initInfinite (fun _ -> 0))
+    let paramArity = Opcode.arity op
+    let paramModes = Seq.take paramArity paramModes |> List.ofSeq
+    let result = (op, List.map ParameterMode.fromInt paramModes)
+    log "instruction: " result |> ignore
+    result
+
 let run (Program ints) (pos: int) (input: Input) (output: Output) =
     let inputArray = Array.ofList ints
-    let set = Array.set inputArray
+    let set p v = 
+        log "setting: " (p,v) |> ignore
+        Array.set inputArray p v
     let get = Array.get inputArray
+
+    let evaluateParam (item, paramMode) =
+        match paramMode with
+        | Position -> get item
+        | Immediate -> item
+
     let parseOpcode x = 
-        let op =  mapping.[get x]
-        let arity = arity.[op]
-        if arity > 0 then        
-            (op, Array.sub inputArray (x + 1) arity, x + 1 + arity)
+        let (op, paramModes) =  parseInstruction (get x)
+        let arity = Opcode.arity op
+        if arity > 0 then
+            let items = Array.sub inputArray (x + 1) arity |> List.ofArray            
+            let parameters = List.zip items paramModes
+
+            (op, parameters, x + 1 + arity)
         else 
-            (op, [||], x)
+            (op, [], x)
 
     let rec runArray inputArray pos = 
+        log "position" pos |> ignore
+        logMany "program" inputArray |> ignore
         match parseOpcode pos with
-        | (Halt, [||], _) -> inputArray
-        | (Add, [|x;y;p|], next) ->
-            set p (get x + get y) |> ignore
+        | (Halt, [], _) -> inputArray
+        | (Add, [(x,xmode);(y,ymode);(p,pmode)], next) ->
+            set p ((evaluateParam (x, xmode)) + (evaluateParam (y, ymode))) |> ignore
             runArray inputArray next
-        | (Multiply, [|x;y;p|], next) ->
-            set p (get x * get y) |> ignore
+        | (Multiply, [(x,xmode);(y,ymode);(p,pmode)], next) ->
+            set p ((evaluateParam (x, xmode))  * (evaluateParam (y, ymode))) |> ignore
             runArray inputArray next
-        | (Input, [|p|], next) ->
-            set p (input()) |> ignore
+        | (Input, [(p, pmode)], next) ->
+            set p (input()) |> ignore            
             runArray inputArray next
-        | (Output, [|p|], next) ->
-            output (get p)
+        | (Output, [(p, pmode)], next) ->
+            output (evaluateParam (p, pmode))
             runArray inputArray next
         | (op, args, next) ->        
             sprintf "Unknown operator: %O on %s" op (System.String.Join(',', args))|> failwith

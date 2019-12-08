@@ -4,9 +4,6 @@ open AoC2019.Shared
 
 type Bounds = int*int
 
-let toList x = 
-    x.ToString() |> Seq.map (string >> int) |> Seq.toList
-
 let isInBounds (lower, upper) x = (x >= lower) && (x <= upper)
 let isNDigits n x = (x.ToString().Length = n)
 let isIncreasing x = 

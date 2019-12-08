@@ -5,7 +5,7 @@ open FsUnit
 open System.IO
 
 let input =     
-    File.ReadAllLines("./Week1InputA.txt") |>
+    File.ReadAllLines("./DagInputA.txt") |>
          Seq.map System.Int32.Parse
 
 [<Test>]

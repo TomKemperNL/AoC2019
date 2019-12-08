@@ -9,6 +9,9 @@ let logMany message (xs: 'a seq) =
     log message joined |> ignore    
     xs
 
+let toList x = 
+    x.ToString() |> Seq.map (string >> int) |> Seq.toList
+
 open System.Text.RegularExpressions
 
     let (|Regex|_|) pattern input =

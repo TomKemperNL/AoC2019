@@ -46,8 +46,7 @@ let toCoordinates instructions origin =
 let manhattan line1 line2 =
     let l1 = toCoordinates (parse line1) ([],(0,0)) |> fst |> Set.ofSeq 
     let l2 = toCoordinates (parse line2) ([],(0,0)) |> fst |> Set.ofSeq
-    Set.intersect l1 l2 
-        |> Set.map (log "intersection")
+    Set.intersect l1 l2         
         |> Set.map (fun (x,y) -> System.Math.Abs x + System.Math.Abs y)
         |> Set.minElement
 

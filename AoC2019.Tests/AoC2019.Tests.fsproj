@@ -9,19 +9,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Day1Tests.fs" />
-    <Content Include="Week1InputA.txt">
+    <Content Include="Dag1InputA.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Compile Include="Day2Tests.fs" />
-        <Content Include="Week2InputA.txt">
+        <Content Include="Dag2InputA.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
         <Compile Include="Day3Tests.fs" />
-        <Content Include="Week3InputA.txt">
+        <Content Include="Dag3InputA.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
         <Compile Include="Day4Tests.fs" />
         <Compile Include="Day5Tests.fs" />
+        <Content Include="Dag5Input.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

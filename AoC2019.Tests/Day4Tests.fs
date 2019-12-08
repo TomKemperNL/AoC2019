@@ -3,6 +3,8 @@
 open NUnit.Framework
 open FsUnit
 
+open AoC2019.Shared
+
 [<Test>]
 let ``Day4 Example`` () =     
     let rules = [
