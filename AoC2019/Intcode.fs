@@ -63,13 +63,11 @@ let parseInstruction x =
     let paramArity = Opcode.arity op
     let paramModes = Seq.take paramArity paramModes |> List.ofSeq
     let result = (op, List.map ParameterMode.fromInt paramModes)
-    log "instruction: " result |> ignore
     result
 
 let run (Program ints) (pos: int) (input: Input) (output: Output) =
     let inputArray = Array.ofList ints
-    let set p v = 
-        log "setting: " (p,v) |> ignore
+    let set p v =     
         Array.set inputArray p v
     let get = Array.get inputArray
 
@@ -90,8 +88,6 @@ let run (Program ints) (pos: int) (input: Input) (output: Output) =
             (op, [], x)
 
     let rec runArray inputArray pos = 
-        log "position" pos |> ignore
-        logMany "program" inputArray |> ignore
         match parseOpcode pos with
         | (Halt, [], _) -> inputArray
         | (Add, [(x,xmode);(y,ymode);(p,pmode)], next) ->
