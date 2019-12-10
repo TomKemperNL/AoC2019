@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
@@ -23,6 +23,10 @@
         <Compile Include="Day4Tests.fs" />
         <Compile Include="Day5Tests.fs" />
         <Content Include="Dag5Input.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Compile Include="Day6Tests.fs" />
+        <Content Include="Dag6Input.txt">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
   </ItemGroup>
