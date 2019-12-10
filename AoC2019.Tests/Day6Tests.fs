@@ -46,4 +46,28 @@ K)L"""
 [<Test>]
 let ``Day6 A`` () = 
     let map = createMap input
-    totals map |> should equal 0
+    totals map |> should equal 147807
+
+[<Test>]
+let ``Day 6B Example`` () =
+    let example = """COM)B
+B)C
+C)D
+D)E
+E)F
+B)G
+G)H
+D)I
+E)J
+J)K
+K)L
+K)YOU
+I)SAN"""
+    let split = example.Split(System.Environment.NewLine)    
+    let map = createMap (parse split)
+    transfers map |> should equal 4
+
+[<Test>]
+let ``Day 6B`` () =
+    let map = createMap input
+    transfers map |> should equal 229

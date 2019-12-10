@@ -47,3 +47,14 @@ let rec orbits map o =
 
 let totals map =
     Map.toSeq map |> Seq.sumBy (fun (k, v) -> orbits map k |> Set.count)
+
+let transfers map = 
+    let orbitsYou = orbits map (OrbitObject "YOU")
+    let orbitsSan = orbits map (OrbitObject "SAN")
+    let intersect = Set.intersect orbitsYou orbitsSan
+    let union = Set.union orbitsYou orbitsSan
+    let diff = Set.difference union intersect
+    Set.count diff
+
+
+
