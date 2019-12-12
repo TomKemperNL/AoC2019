@@ -13,7 +13,7 @@ let ``Day5 echo IO`` () =
     let mutable out = -1
     let output x = 
         out <- x
-    run (Program [3;0;4;0;99]) 0 input output |> ignore
+    run ((Program [3;0;4;0;99]),input, output) |> ignore
     out |> should equal 5
 
 [<Test>]
@@ -31,7 +31,7 @@ let ``Day5 A`` () =
     let out = new System.Collections.Generic.List<int>()
     let output x = 
         out.Add(x)
-    run (Program program) 0 input output |> ignore
+    run ((Program program), input, output) |> ignore
     let (diag, tests) = match Seq.rev out |> List.ofSeq with
     | diag::tests -> (diag, tests)
     | _ -> failwith "Nope"
@@ -45,7 +45,7 @@ let ``Day5 B Examples`` () =
     let mutable out = -1
     let output x = 
         out <- x
-    run (Program program) 0 (fun () -> 0) output |> ignore
+    run ((Program program), (fun () -> 0), output) |> ignore
     out |> should equal 0
 
 
@@ -55,7 +55,7 @@ let ``Day5 B`` () =
     let out = new System.Collections.Generic.List<int>()
     let output x = 
         out.Add(x)
-    run (Program program) 0 input output |> ignore
+    run ((Program program), input, output) |> ignore
     let diag = match Seq.rev out |> List.ofSeq with
     | [diag] -> diag
     | _ -> failwith "Nope"    
