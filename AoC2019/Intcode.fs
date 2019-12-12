@@ -5,16 +5,17 @@ open AoC2019.Shared
 type Input = unit -> int
 type Output = int -> unit
 type Program = Program of int list
+type System = Program*Input*Output
 type ParameterMode =
     | Position
     | Immediate
 
 module ParameterMode =
     let fromInt x =
-    match x with
-    | 0 -> Position
-    | 1 -> Immediate
-    | n -> failwith <| sprintf "Unknown parameter mode %d" n
+        match x with
+        | 0 -> Position
+        | 1 -> Immediate
+        | n -> failwith <| sprintf "Unknown parameter mode %d" n
 
 type Parameter = ParameterMode * int
 
@@ -65,7 +66,9 @@ let parseInstruction x =
     let result = (op, List.map ParameterMode.fromInt paramModes)
     result
 
-let run (Program ints) (pos: int) (input: Input) (output: Output) =
+let run ((Program ints),input,output) =
+    let pos = 0
+    
     let inputArray = Array.ofList ints
     let set p v =     
         Array.set inputArray p v

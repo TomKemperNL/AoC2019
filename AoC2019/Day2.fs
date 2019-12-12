@@ -7,7 +7,7 @@ let runValue (Program input) noun verb =
     let rest = List.skip 3 input
     let [a;_;_] = List.take 3 input
     let program = Program (List.append [a;noun;verb] rest)
-    let (Program result) = run program 0 noInput noOutput
+    let (Program result) = run (program, noInput, noOutput)
     List.head result
 
 let bruteForce intcode desired =    
