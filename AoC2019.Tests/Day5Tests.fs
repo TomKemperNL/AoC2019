@@ -9,11 +9,11 @@ open AoC2019.Intcode
 
 [<Test>]
 let ``Day5 echo IO`` () =     
-    let input () = 5
+    let input () = Some 5
     let mutable out = -1
     let output x = 
         out <- x
-    run ((Program [3;0;4;0;99]),input, output) |> ignore
+    run ((Program [3;0;4;0;99]), input, output) |> ignore
     out |> should equal 5
 
 [<Test>]
@@ -27,7 +27,7 @@ let program =
 
 [<Test>]
 let ``Day5 A`` () =
-    let input () = 1
+    let input () = Some 1
     let out = new System.Collections.Generic.List<int>()
     let output x = 
         out.Add(x)
@@ -45,13 +45,13 @@ let ``Day5 B Examples`` () =
     let mutable out = -1
     let output x = 
         out <- x
-    run ((Program program), (fun () -> 0), output) |> ignore
+    run ((Program program), (fun () -> Some 0), output) |> ignore
     out |> should equal 0
 
 
 [<Test>]
 let ``Day5 B`` () =
-    let input () = 5
+    let input () = Some 5
     let out = new System.Collections.Generic.List<int>()
     let output x = 
         out.Add(x)

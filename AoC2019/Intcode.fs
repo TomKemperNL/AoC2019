@@ -2,9 +2,18 @@
 
 open AoC2019.Shared
 
-type Input = unit -> int
-type Output = int -> unit
 type Program = Program of int list
+type ProgramResult = 
+    | End 
+    | Pause
+
+type Continuation = unit -> ProgramResult
+
+type Input = Continuation -> int option
+module Input = 
+    let constant x = 
+        fun () -> Some x
+type Output = int -> unit
 type System = Program*Input*Output
 type ParameterMode =
     | Position
@@ -90,9 +99,10 @@ let run ((Program ints),input,output) =
         else 
             (op, [], x)
 
-    let rec runArray inputArray pos = 
+    let rec runArray inputArray pos : (ProgramResult * int array)= 
         match parseOpcode pos with
-        | (Halt, [], _) -> inputArray
+        | (Halt, [], _) -> 
+            (End, inputArray) 
         | (Add, [(x,xmode);(y,ymode);(p,pmode)], next) ->
             set p ((evaluateParam (x, xmode)) + (evaluateParam (y, ymode))) |> ignore
             runArray inputArray next
@@ -100,8 +110,13 @@ let run ((Program ints),input,output) =
             set p ((evaluateParam (x, xmode))  * (evaluateParam (y, ymode))) |> ignore
             runArray inputArray next
         | (Input, [(p, pmode)], next) ->
-            set p (input()) |> ignore            
-            runArray inputArray next
+
+            match input() with
+            | Some x ->
+                set p x |> ignore            
+                runArray inputArray next
+            | None -> 
+                (Pause, inputArray) 
         | (Output, [(p, pmode)], next) ->
             output (evaluateParam (p, pmode))
             runArray inputArray next
@@ -131,4 +146,5 @@ let run ((Program ints),input,output) =
         | (op, args, next) ->        
             sprintf "Unknown operator: %O on %s" op (System.String.Join(',', args))|> failwith
 
-    runArray inputArray pos |> List.ofArray |> Program
+    let (t, p) = runArray inputArray pos 
+    (t, Program (List.ofArray p))

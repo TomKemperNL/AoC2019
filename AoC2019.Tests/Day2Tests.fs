@@ -11,7 +11,7 @@ let input =
         |> List.map System.Int32.Parse
 
 let test input = 
-    run ((Program input), noInput, noOutput) |> fun (Program x) -> x 
+    run ((Program input), noInput, noOutput) |> fun (_, (Program x)) -> x 
 
 [<Test>]
 let ``Day2 Example`` () =     
