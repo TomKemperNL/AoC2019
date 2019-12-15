@@ -2,19 +2,23 @@
 
 open AoC2019.Shared
 
-type Program = Program of int list
-type ProgramResult = 
-    | End 
-    | Pause
-
-type Continuation = unit -> ProgramResult
-
 type Input = unit -> int option
 module Input = 
     let constant x = 
         fun () -> Some x
 type Output = int -> unit
+
+type Program = Program of int list
 type System = Program*Input*Output
+type SystemState = (Program*Input*Output) * int
+
+type ProgramResult = 
+    | End 
+    | Pause of SystemState
+
+
+
+
 type ParameterMode =
     | Position
     | Immediate
@@ -75,9 +79,9 @@ let parseInstruction x =
     let result = (op, List.map ParameterMode.fromInt paramModes)
     result
 
-let run ((Program ints),input,output) =
-    let pos = 0
-    
+
+
+let runAt pos ((Program ints),input,output) : ProgramResult * Program =
     let inputArray = Array.ofList ints
     let set p v =     
         Array.set inputArray p v
@@ -116,7 +120,9 @@ let run ((Program ints),input,output) =
                 set p x |> ignore            
                 runArray inputArray next
             | None -> 
-                (Pause, inputArray |> log "Pausing") 
+                let program = Program (List.ofArray inputArray)
+                let system = (program, input, output), pos
+                (Pause system, inputArray) |> log "Pausing"
         | (Output, [(p, pmode)], next) ->
             output (evaluateParam (p, pmode))
             runArray inputArray next
@@ -148,3 +154,6 @@ let run ((Program ints),input,output) =
 
     let (t, p) = runArray inputArray pos 
     (t, Program (List.ofArray p))
+
+let run (system:System) : ProgramResult * Program =    
+    runAt 0 system

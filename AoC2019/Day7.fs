@@ -9,27 +9,18 @@ let linkedIO setting marker =
     let q = System.Collections.Generic.Queue<int>()
     q.Enqueue(setting)
 
-    let continuations = System.Collections.Generic.Queue<obj>()
-    let input continueIfEmpty = 
+    let input () = 
         match q.TryPeek() with 
         | true, x -> 
             log (sprintf "Providing %s input:" marker) x |> ignore
             Some (q.Dequeue())
         | false, _ -> 
-            log "adding continuation" |> ignore
-            continuations.Enqueue continueIfEmpty
             None
         
     let output x =         
         log (sprintf "Providing %s output:" marker) x |> ignore
         q.Enqueue x
-        match continuations.TryPeek() with 
-        | true, _ -> 
-            log "continueing" |> ignore
-            (continuations.Dequeue) () |> ignore
-            ()
-        | false, _ -> 
-            ()
+    
     (input, output)
 
 let xcombine (configs: ((Input*Output)*Program) list) finalOutput : (Output * System list) =
@@ -47,7 +38,20 @@ let xcombine (configs: ((Input*Output)*Program) list) finalOutput : (Output * Sy
                 combinePrograms (((i2,o1), p2) :: t) (i2,o1) ((result :: results))            
 
         o0, combinePrograms configs (i1, o0) []
-        
+
+let rec runLoop (systems: SystemState list) =     
+    match systems with
+    | [] -> ()
+    | (h,pos) :: t ->
+        match (runAt pos h) with
+        | End, _ ->             
+            runLoop t
+        | Pause cont, _ ->
+            let atEnd = List.append t [cont]
+            runLoop atEnd
+
+
+
 let runThruster (p: Program) (settings: int list) = 
     let mutable outputResult = -1
     let finalOutput = fun x ->         
@@ -57,18 +61,24 @@ let runThruster (p: Program) (settings: int list) =
     let configs = Seq.initInfinite (constant p) |> Seq.zip settings |> List.ofSeq
     let (passInput, thruster) = xcombine configs finalOutput
     passInput 0
-    List.iter (run >> ignore) thruster
+
+    let startingStates = Seq.zip thruster (Seq.initInfinite (constant 0)) |> List.ofSeq
+
+    //List.iter (run >> ignore) thruster
+    runLoop startingStates |> ignore
+    
     outputResult
 
-let rec inAllSpots (item: 'a) (list: 'a list)= 
-    match list with 
-    | [] -> [[item]]
-    | h::t ->            
-        let opt = item::(h::t) 
-        let others = List.map (fun o -> h::o) (inAllSpots item t)
-        opt :: others
+let rec permutations (items: 'a list) : 'a list list =     
+    let rec inAllSpots (item: 'a) (list: 'a list)= 
+        match list with 
+        | [] -> [[item]]
+        | h::t ->            
+            let opt = item::(h::t) 
+            let others = List.map (fun o -> h::o) (inAllSpots item t)
+            opt :: others
+    
 
-let rec permutations (items: 'a list) : 'a list list = 
     match items with 
     | [] -> [[]]
     | h :: t ->    
