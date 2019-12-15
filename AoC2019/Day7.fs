@@ -23,6 +23,13 @@ let linkedIO setting marker =
     
     (input, output)
 
+
+let teeOutput originalOutput alsoTo =
+    let output x =
+        originalOutput x
+        alsoTo x
+    output
+
 let xcombine (configs: ((Input*Output)*Program) list) finalOutput : (Output * System list) =
     match configs with
     | [] -> (fun _ -> ()), []
@@ -31,7 +38,8 @@ let xcombine (configs: ((Input*Output)*Program) list) finalOutput : (Output * Sy
             match configs with 
             | [] -> 
                 results |> List.rev
-            | [((i, _), p)] ->                
+            | [((i, _), p)] ->         
+                let finalOutput = teeOutput o0 finalOutput
                 (p, i, finalOutput) :: results |> List.rev
             | ((i1,_), p1) :: (((i2,o1), p2) :: t) ->    
                 let result = (p1, i1, o1)

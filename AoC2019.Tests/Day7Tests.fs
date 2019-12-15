@@ -43,4 +43,4 @@ let ``Day 7B Example NonMax`` () =
 
 [<Test>]
 let ``Day 7B`` () =
-    maxThrusterLoop program |> should equal 0
+    maxThrusterLoop program |> should equal 1518124
