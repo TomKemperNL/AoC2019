@@ -7,6 +7,12 @@ open System.IO
 open AoC2019.Intcode
 
 [<Test>]
+let ``Day 7 Examples NonMax`` () =
+    let program = Program [3;15;3;16;1002;16;10;16;1;16;15;15;4;15;99;0;0]
+    let setting = [4;3;2;1;0]
+    runThruster program setting |> should equal 43210
+    
+[<Test>]
 let ``Day 7 Examples`` () =
     let program = Program [3;15;3;16;1002;16;10;16;1;16;15;15;4;15;99;0;0]
     maxThruster program |> should equal 43210

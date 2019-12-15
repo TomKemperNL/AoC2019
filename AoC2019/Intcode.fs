@@ -9,7 +9,7 @@ type ProgramResult =
 
 type Continuation = unit -> ProgramResult
 
-type Input = Continuation -> int option
+type Input = unit -> int option
 module Input = 
     let constant x = 
         fun () -> Some x
@@ -102,7 +102,7 @@ let run ((Program ints),input,output) =
     let rec runArray inputArray pos : (ProgramResult * int array)= 
         match parseOpcode pos with
         | (Halt, [], _) -> 
-            (End, inputArray) 
+            (End, inputArray |> log "Halting") 
         | (Add, [(x,xmode);(y,ymode);(p,pmode)], next) ->
             set p ((evaluateParam (x, xmode)) + (evaluateParam (y, ymode))) |> ignore
             runArray inputArray next
@@ -116,7 +116,7 @@ let run ((Program ints),input,output) =
                 set p x |> ignore            
                 runArray inputArray next
             | None -> 
-                (Pause, inputArray) 
+                (Pause, inputArray |> log "Pausing") 
         | (Output, [(p, pmode)], next) ->
             output (evaluateParam (p, pmode))
             runArray inputArray next

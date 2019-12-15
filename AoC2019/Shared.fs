@@ -12,6 +12,8 @@ let logMany message (xs: 'a seq) =
 let toList x = 
     x.ToString() |> Seq.map (string >> int) |> Seq.toList
 
+let constant x = fun _ -> x
+
 open System.Text.RegularExpressions
 
     let (|Regex|_|) pattern input =

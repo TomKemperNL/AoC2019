@@ -2,7 +2,8 @@
 open AoC2019.Intcode
 open AoC2019.Shared
 
-type Thruster = System*int
+type ThrusterConfig = System*int
+
 
 let linkedIO setting marker = 
     let q = System.Collections.Generic.Queue<int>()
@@ -15,50 +16,49 @@ let linkedIO setting marker =
             log (sprintf "Providing %s input:" marker) x |> ignore
             Some (q.Dequeue())
         | false, _ -> 
+            log "adding continuation" |> ignore
             continuations.Enqueue continueIfEmpty
             None
         
     let output x =         
         log (sprintf "Providing %s output:" marker) x |> ignore
         q.Enqueue x
+        match continuations.TryPeek() with 
+        | true, _ -> 
+            log "continueing" |> ignore
+            (continuations.Dequeue) () |> ignore
+            ()
+        | false, _ -> 
+            ()
     (input, output)
 
+let xcombine (configs: ((Input*Output)*Program) list) finalOutput : (Output * System list) =
+    match configs with
+    | [] -> (fun _ -> ()), []
+    | ((i1,o0), _) :: _ ->           
+        let rec combinePrograms configs ((prevIn, prevOut): Input*Output) (results: System list) = 
+            match configs with 
+            | [] -> 
+                results |> List.rev
+            | [((i, _), p)] ->                
+                (p, i, finalOutput) :: results |> List.rev
+            | ((i1,_), p1) :: (((i2,o1), p2) :: t) ->    
+                let result = (p1, i1, o1)
+                combinePrograms (((i2,o1), p2) :: t) (i2,o1) ((result :: results))            
 
+        o0, combinePrograms configs (i1, o0) []
+        
+let runThruster (p: Program) (settings: int list) = 
+    let mutable outputResult = -1
+    let finalOutput = fun x ->         
+        outputResult <- x
+    let settings = List.mapi (fun ix s -> linkedIO s (sprintf "s%i" (ix + 1))) settings
 
-let runThruster p (s1,s2,s3,s4,s5) =     
-    log "running Settings " (s1,s2,s3,s4,s5) |> ignore
-    let input1, output0 = linkedIO s1 "s1"
-    let input2, output1 = linkedIO s2 "s2"
-    let input3, output2 = linkedIO s3 "s3"
-    let input4, output3 = linkedIO s4 "s4"
-    let input5, output4 = linkedIO s5 "s5"
-
-    let mutable output = -1
-
-    let thruster1 = (p, input1, output1)
-    let thruster2 = (p, input2, output2)
-    let thruster3 = (p, input3, output3)
-    let thruster4 = (p, input4, output4)
-    let thruster5 = (p, input5, fun x -> output <- x)
-
-    output0(0)
-    run thruster1 |> log "output1" |> ignore
-    run thruster2 |> ignore
-    run thruster3 |> ignore
-    run thruster4 |> ignore
-    run thruster5 |> ignore
-
-    output
-
-
-let toTuple5 list =
-    match list with 
-    | [x1;x2;x3;x4;x5] -> (x1,x2,x3,x4,x5)
-    | _ -> failwith "not a 5-length list"
-
-let toList (x1,x2,x3,x4,x5) =
-    [x1;x2;x3;x4;x5]
-
+    let configs = Seq.initInfinite (constant p) |> Seq.zip settings |> List.ofSeq
+    let (passInput, thruster) = xcombine configs finalOutput
+    passInput 0
+    List.iter (run >> ignore) thruster
+    outputResult
 
 let rec inAllSpots (item: 'a) (list: 'a list)= 
     match list with 
@@ -80,17 +80,11 @@ let rec permutations (items: 'a list) : 'a list list =
 
 let maxThruster p = 
     let settings = [0;1;2;3;4]
-
     let allSettings = permutations settings
-    let allSettings = List.map toTuple5 allSettings
-
     List.map (runThruster p) allSettings |> List.max
    
 let maxThrusterLoop p = 
     let settings = [5;6;7;8;9]
-
     let allSettings = permutations settings
-    let allSettings = List.map toTuple5 allSettings
-
     List.map (runThruster p) allSettings |> List.max
     
