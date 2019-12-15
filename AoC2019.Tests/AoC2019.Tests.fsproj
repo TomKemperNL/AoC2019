@@ -37,6 +37,10 @@
         <Content Include="Dag8Input.txt">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <Compile Include="Day9Tests.fs" />
+        <Content Include="Dag9Input.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

@@ -50,8 +50,8 @@ let xcombine (configs: ((Input*Output)*Program) list) finalOutput : (Output * Sy
 let rec runLoop (systems: SystemState list) =     
     match systems with
     | [] -> ()
-    | (h,pos) :: t ->
-        match (runAt pos h) with
+    | (h,pos, rb) :: t ->
+        match (runAt rb pos h) with
         | End, _ ->             
             runLoop t
         | Pause cont, _ ->
@@ -70,7 +70,7 @@ let runThruster (p: Program) (settings: int list) =
     let (passInput, thruster) = xcombine configs finalOutput
     passInput 0
 
-    let startingStates = Seq.zip thruster (Seq.initInfinite (constant 0)) |> List.ofSeq
+    let startingStates = Seq.zip3 thruster (Seq.initInfinite (constant 0)) (Seq.initInfinite (constant 0)) |> List.ofSeq
 
     //List.iter (run >> ignore) thruster
     runLoop startingStates |> ignore
